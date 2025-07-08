@@ -16,6 +16,9 @@ scratch=0 &&
 script_dir="$(cd $(dirname ${0}) ; pwd)" &&
 
 input_socket="${script_dir}/vm-input.sock" &&
+input_snd_client="socat - UNIX-CONNECT:${input_socket}" &&
+input_socket="127.0.0.1:4444" &&
+input_snd_client="socat - TCP:127.0.0.1:4444" &&
 
 cdrom_file="${script_dir}/ms-dos.iso" &&
 if [ ${scratch} -eq 1 ]
@@ -52,8 +55,13 @@ qemu_pid="$( qemu-system-x86_64 \
   ` # CPU cores for the machine ` \
   -smp 1 \
   ` # Using socket file to send commands to qemu console, and key strokes ` \
-  -monitor unix:"${input_socket}",server,nowait \
+  ` # -monitor unix:"${input_socket}",server,nowait ` \
+  -monitor tcp:${input_socket},server,nowait \
+  ` # -monitor stdio ` \
+  ` # -display curses ` \
   ` # -display none ` \
+  -vnc :0 \
+  ` # -machine graphics=off ` \
   ` # -serial stdio ` \
   -hda ${hdd_file} \
   ` # Mount ISO as CD-ROM ` \
@@ -64,8 +72,52 @@ qemu_pid="$( qemu-system-x86_64 \
   -boot a \
   1>/dev/null \
   2>&1 \
-  & 
+  &
   echo ${!} )" &&
+
+# url="https://dl-alt1.winworldpc.com/Microsoft%20MS-DOS%206.22%20Plus%20Enhanced%20Tools%20(3.5).7z" &&
+sleep 10 &&
+# Start setup
+#echo "quit" | ${input_snd_client} &&
+echo "sendkey ret" | ${input_snd_client} &&
+sleep 2 &&
+# configure unallocated disk space
+echo "sendkey ret" | ${input_snd_client} &&
+sleep 2 &&
+# setup will restart computer.ensure disk A is inserted in drive A
+echo "sendkey ret" | ${input_snd_client} &&
+# restarting machine and formatting disk C:
+sleep 30 &&
+# confirm configuration for OS
+echo "sendkey ret" | ${input_snd_client} &&
+sleep 3 &&
+# confirm OS install directory C:\DOS
+echo "sendkey ret" | ${input_snd_client} &&
+# installing from floppy disk 1
+sleep 40 &&
+# insert and confirm floppy disk 2
+echo "change floppy0 ${script_dir}/ms-dos-setup/Disk2.img" | ${input_snd_client} &&
+sleep 1 &&
+echo "sendkey ret" | ${input_snd_client} &&
+# installing from floppy disk 2
+sleep 40 &&
+# insert and confirm floppy disk 3
+echo "change floppy0 ${script_dir}/ms-dos-setup/Disk3.img" | ${input_snd_client} &&
+sleep 1 &&
+echo "sendkey ret" | ${input_snd_client} &&
+# installing from floppy disk 1
+sleep 40 &&
+# eject floppy disk and confirm
+echo "eject floppy0" | ${input_snd_client} &&
+sleep 1 &&
+echo "sendkey ret" | ${input_snd_client} &&
+# restart machine
+sleep 1 &&
+echo "sendkey ret" | ${input_snd_client} &&
+# stop machine
+sleep 20 &&
+echo "quit" | ${input_snd_client} &&
+
 
 # url="https://archive.org/download/ms-dos-6.22_dvd/MS-DOS%206.22.iso" &&
 # This is only live - no way to install it
