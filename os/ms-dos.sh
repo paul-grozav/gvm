@@ -118,6 +118,28 @@ echo "sendkey ret" | ${input_snd_client} &&
 sleep 20 &&
 echo "quit" | ${input_snd_client} &&
 
+# Use mTCP to connect MS-DOS to the network and user FTP to fetch files into
+# MS-DOS: https://www.brutman.com/mTCP/
+
+(
+  exit 0;
+  dd if=/dev/zero of=tedi_manual_floppy.img bs=512 count=2880 &&
+  mkfs.vfat tedi_manual_floppy.img &&
+  fdisk -l tedi_manual_floppy.img &&
+  mkdir floppy &&
+  mount -o loop tedi_manual_floppy.img $(pwd)/floppy &&
+  # Using mtools to read/write to MS-DOS floppy disks
+  echo "drive a: file=\"$(pwd)/tedi_manual_floppy.img\" fat_bits=12" \
+    > ${HOME}/.mtoolsrc &&
+  # List files on floppy disk
+  # mdir a: &&
+  # mcopy file.txt a: &&
+  # mcopy * a: &&
+  true
+) &&
+
+
+# ============================================================================ #
 
 # url="https://archive.org/download/ms-dos-6.22_dvd/MS-DOS%206.22.iso" &&
 # This is only live - no way to install it
