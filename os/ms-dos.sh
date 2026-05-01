@@ -170,3 +170,15 @@ echo "quit" | ${input_snd_client} &&
 
 true 
 # ============================================================================ #
+# qemu-system-x86_64 \
+#   -m 2G \
+#   -enable-kvm \
+#   -vga qxl \
+#   -device virtio-serial-pci \
+#   -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
+#   -chardev spicevmc,id=spicechannel0,name=vdagent \
+#   -spice port=5900,addr=0.0.0.0,disable-ticketing=on \
+#   -display none
+
+# remote-viewer spice://127.0.0.1:5900
+# ============================================================================ #
