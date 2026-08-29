@@ -1,0 +1,11 @@
+; ============================================================================ ;
+; Author: Tancredi-Paul Grozav <paul@grozav.info>
+; ============================================================================ ;
+; This is loaded by the DOS OS when it boots, and it is responsible of loading
+; additional device drivers. Like the network one below.
+; ============================================================================ ;
+; I think this is no longer needed for mTCP
+; FILES=20
+; DEVICE=C:\NET\ifshlp.sys
+; LASTDRIVE=Z
+; ============================================================================ ;
