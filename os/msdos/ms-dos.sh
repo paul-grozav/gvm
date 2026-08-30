@@ -136,6 +136,12 @@ fi &&
 mkdir ${bin_dir}/mTCP &&
 unzip ${bin_dir}/mTCP.zip -d ${bin_dir}/mTCP &&
 
+qemu-img convert -f qcow2 -O raw tmp/vm.img tmp/vm.img.raw &&
+mdir -i tmp/vm.img.raw@@32256 ::/ &&
+
+
+
+
 dd if=/dev/zero of=${bin_dir}/dosnet.img bs=1K count=1440 &&
 mformat -f 1440 -i ${bin_dir}/dosnet.img :: &&
 #offset=$(( 1 * 1024 * 1024 )) &&
