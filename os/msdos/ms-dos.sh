@@ -22,6 +22,7 @@ input_socket="127.0.0.1:4444" &&
 input_snd_client="socat - TCP:127.0.0.1:4444" &&
 
 cdrom_file="${bin_dir}/ms-dos.iso" &&
+( exit 0 ;
 if [ ${scratch} -eq 1 ]
 then
   rm -f ${cdrom_file}
@@ -132,8 +133,58 @@ then
     -O ${bin_dir}/mTCP.zip
 fi &&
 mkdir ${bin_dir}/mTCP &&
-mv ${bin_dir}/mTCP.zip ${bin_dir}/mTCP/mTCP.zip &&
-unzip ${bin_dir}/mTCP/mTCP.zip -d ${bin_dir}/mTCP &&
+unzip ${bin_dir}/mTCP.zip -d ${bin_dir}/mTCP &&
+
+dd if=/dev/zero of=${bin_dir}/dosnet.img bs=1K count=1440 &&
+mformat -f 1440 -i ${bin_dir}/dosnet.img :: &&
+#offset=$(( 1 * 1024 * 1024 )) &&
+mcopy -i ${bin_dir}/dosnet.img ${bin_dir}/mTCP/dhcp.exe ::/ &&
+) &&
+# qemu-system-x86_64 \
+#   -m 16M \
+#   -display none \
+#   -machine graphics=off \
+#   -monitor tcp:127.0.0.1:4444,server,nowait \
+#   -boot c \
+#   -hda tmp/vm.img \
+#   -fda tmp/ms-dos-setup/Disk1.img \
+#   &&
+
+
+qemu_pid="$( qemu-system-x86_64 \
+  ` # RAM for the machine ` \
+  -m 16M \
+  ` # CPU cores for the machine ` \
+  -smp 1 \
+  ` # Using socket file to send commands to qemu console, and key strokes ` \
+  ` # -monitor unix:"${input_socket}",server,nowait ` \
+  -monitor tcp:${input_socket},server,nowait \
+  ` # -monitor stdio ` \
+  ` # -display curses ` \
+  ` # -display none ` \
+  -vnc :0 \
+  ` # -machine graphics=off ` \
+  ` # -serial stdio ` \
+  -hda ${hdd_file} \
+  ` # Mount ISO as CD-ROM ` \
+  ` # -cdrom ${cdrom_file} ` \
+  ` # Mount Floppy disk ` \
+  -fda ${bin_dir}/dosnet.img \
+  ` # Boot from Hard Disk ` \
+  -boot c \
+  1>/dev/null \
+  2>&1 \
+  &
+  echo ${!} )" &&
+
+# Wait to boot
+sleep 10 &&
+# Copy from floppy to disk
+echo "copy A:\dhcp.exe" | ${input_snd_client} &&
+sleep 2 &&
+echo "quit" | ${input_snd_client} &&
+
+
 
 
 (
@@ -150,18 +201,6 @@ unzip ${bin_dir}/mTCP/mTCP.zip -d ${bin_dir}/mTCP &&
   # mdir a: &&
   # mcopy file.txt a: &&
   # mcopy * a: &&
-
-  qemu-system-x86_64 \
-    -m 16M \
-    -serial stdio \
-    -display none \
-    -machine graphics=off \
-    -monitor tcp:127.0.0.1:4444,server,nowait \
-    -boot c \
-    -hda tmp/vm.img \
-    -fda tmp/ms-dos-setup/Disk1.img \
-    &&
-
   true
 ) &&
 
