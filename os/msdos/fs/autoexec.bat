@@ -4,7 +4,18 @@
 @ECHO OFF
 echo # =========================================================================== #
 echo Tancredi-Paul Grozav ^<paul@grozav.info^>
-set PATH=%PATH%;C:\FREEDOS;C:\mtcp;
+
+:: ========================================================================== ::
+:: Original autoexec.bat file content
+:: ========================================================================== ::
+C:\DOS\SMARTDRV.EXE /X
+@ECHO OFF
+PROMPT $p$g
+PATH C:\DOS
+SET TEMP=C:\DOS
+:: ========================================================================== ::
+
+set PATH=%PATH%;C:\mtcp;
 :: Initialize network
 :: net initialize
 :: nwlink
