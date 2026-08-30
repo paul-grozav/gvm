@@ -136,17 +136,20 @@ fi &&
 mkdir ${bin_dir}/mTCP &&
 unzip ${bin_dir}/mTCP.zip -d ${bin_dir}/mTCP &&
 
-qemu-img convert -f qcow2 -O raw tmp/vm.img tmp/vm.img.raw &&
-mdir -i tmp/vm.img.raw@@32256 ::/ &&
+# Will need it raw anyway for netbooting.
+qemu-img convert -f qcow2 -O raw \
+  ${bin_dir}/tmp/vm.img ${bin_dir}/tmp/vm.img.raw &&
+offset=$(( 32 * 1000 + 256 )) &&
+mdir -i ${bin_dir}/tmp/vm.img.raw@@${offset} ::/ &&
+mcopy -i ${bin_dir}/tmp/vm.img.raw@@${offset} \
+  -s ${bin_dir}/tmp/mTCP ::/mtcp &&
 
 
 
-
-dd if=/dev/zero of=${bin_dir}/dosnet.img bs=1K count=1440 &&
-mformat -f 1440 -i ${bin_dir}/dosnet.img :: &&
-#offset=$(( 1 * 1024 * 1024 )) &&
-mcopy -i ${bin_dir}/dosnet.img ${bin_dir}/mTCP/dhcp.exe ::/ &&
-true) &&
+# dd if=/dev/zero of=${bin_dir}/dosnet.img bs=1K count=1440 &&
+# mformat -f 1440 -i ${bin_dir}/dosnet.img :: &&
+# mcopy -i ${bin_dir}/dosnet.img ${bin_dir}/mTCP/dhcp.exe ::/ &&
+# true) &&
 
 qemu_pid="$( qemu-system-x86_64 \
   ` # RAM for the machine ` \
