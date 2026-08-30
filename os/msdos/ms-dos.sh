@@ -22,7 +22,7 @@ input_socket="127.0.0.1:4444" &&
 input_snd_client="socat - TCP:127.0.0.1:4444" &&
 
 cdrom_file="${bin_dir}/ms-dos.iso" &&
-( exit 0 ;
+
 if [ ${scratch} -eq 1 ]
 then
   rm -f ${cdrom_file}
@@ -53,6 +53,7 @@ then
 fi &&
 
 # true; exit 0
+( exit 0 ;
 
 qemu_pid="$( qemu-system-x86_64 \
   ` # RAM for the machine ` \
@@ -139,17 +140,7 @@ dd if=/dev/zero of=${bin_dir}/dosnet.img bs=1K count=1440 &&
 mformat -f 1440 -i ${bin_dir}/dosnet.img :: &&
 #offset=$(( 1 * 1024 * 1024 )) &&
 mcopy -i ${bin_dir}/dosnet.img ${bin_dir}/mTCP/dhcp.exe ::/ &&
-) &&
-# qemu-system-x86_64 \
-#   -m 16M \
-#   -display none \
-#   -machine graphics=off \
-#   -monitor tcp:127.0.0.1:4444,server,nowait \
-#   -boot c \
-#   -hda tmp/vm.img \
-#   -fda tmp/ms-dos-setup/Disk1.img \
-#   &&
-
+true) &&
 
 qemu_pid="$( qemu-system-x86_64 \
   ` # RAM for the machine ` \
@@ -180,7 +171,7 @@ qemu_pid="$( qemu-system-x86_64 \
 # Wait to boot
 sleep 10 &&
 # Copy from floppy to disk
-echo "copy A:\dhcp.exe" | ${input_snd_client} &&
+echo "copy A:\\dhcp.exe" | ${input_snd_client} &&
 sleep 2 &&
 echo "quit" | ${input_snd_client} &&
 
