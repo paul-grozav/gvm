@@ -1,9 +1,6 @@
 :: ========================================================================== ::
 :: Author: Tancredi-Paul Grozav <paul@grozav.info>
 :: ========================================================================== ::
-@ECHO OFF
-echo # =========================================================================== #
-echo Tancredi-Paul Grozav ^<paul@grozav.info^>
 
 :: ========================================================================== ::
 :: Original autoexec.bat file content
@@ -15,13 +12,15 @@ PATH C:\DOS
 SET TEMP=C:\DOS
 :: ========================================================================== ::
 
-set PATH=%PATH%;C:\mtcp;
-:: Initialize network
-:: net initialize
-:: nwlink
-:: net start
-set MTCPCFG=C:\mtcp\mtcp.cfg
-C:\mtcp\ne2000.com 0x60
-C:\mtcp\dhcp.exe
-echo # =========================================================================== #
+:: echo # =========================================================================== #
+:: echo Tancredi-Paul Grozav ^<paul@grozav.info^>
+:: set PATH=%PATH%;C:\mtcp;
+:: :: Initialize network
+:: :: net initialize
+:: :: nwlink
+:: :: net start
+:: set MTCPCFG=C:\mtcp\mtcp.cfg
+:: C:\mtcp\ne2000.com 0x60
+:: C:\mtcp\dhcp.exe
+:: echo # =========================================================================== #
 :: ========================================================================== ::

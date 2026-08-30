@@ -50,81 +50,86 @@ then
 fi &&
 if [ ! -f ${hdd_file} ]
 then
-  qemu-img create -f qcow2 ${hdd_file} 50M
+  # qemu-img create -f qcow2 ${hdd_file} 50M
+  qemu-img create -f raw ${hdd_file} 50M
 fi &&
 
 # true; exit 0
-( exit 0 ;
 
-qemu_pid="$( qemu-system-x86_64 \
-  ` # RAM for the machine ` \
-  -m 16M \
-  ` # CPU cores for the machine ` \
-  -smp 1 \
-  ` # Using socket file to send commands to qemu console, and key strokes ` \
-  ` # -monitor unix:"${input_socket}",server,nowait ` \
-  -monitor tcp:${input_socket},server,nowait \
-  ` # -monitor stdio ` \
-  ` # -display curses ` \
-  ` # -display none ` \
-  -vnc :0 \
-  ` # -machine graphics=off ` \
-  ` # -serial stdio ` \
-  -hda ${hdd_file} \
-  ` # Mount ISO as CD-ROM ` \
-  ` # -cdrom ${cdrom_file} ` \
-  ` # Mount Floppy disk ` \
-  -fda ${bin_dir}/ms-dos-setup/Disk1.img \
-  ` # Boot from CD-ROM ` \
-  -boot a \
-  1>/dev/null \
-  2>&1 \
-  &
-  echo ${!} )" &&
+if [ ! -f ${hdd_file}_fresh_install.tgz ]
+then
+  qemu_pid="$( qemu-system-x86_64 \
+    ` # RAM for the machine ` \
+    -m 16M \
+    ` # CPU cores for the machine ` \
+    -smp 1 \
+    ` # Using socket file to send commands to qemu console, and key strokes ` \
+    ` # -monitor unix:"${input_socket}",server,nowait ` \
+    -monitor tcp:${input_socket},server,nowait \
+    ` # -monitor stdio ` \
+    ` # -display curses ` \
+    ` # -display none ` \
+    -vnc :0 \
+    ` # -machine graphics=off ` \
+    ` # -serial stdio ` \
+    -hda ${hdd_file} \
+    ` # Mount ISO as CD-ROM ` \
+    ` # -cdrom ${cdrom_file} ` \
+    ` # Mount Floppy disk ` \
+    -fda ${bin_dir}/ms-dos-setup/Disk1.img \
+    ` # Boot from CD-ROM ` \
+    -boot a \
+    1>/dev/null \
+    2>&1 \
+    &
+    echo ${!} )" &&
 
-# url="https://dl-alt1.winworldpc.com/Microsoft%20MS-DOS%206.22%20Plus%20Enhanced%20Tools%20(3.5).7z" &&
-sleep 10 &&
-# Start setup
-#echo "quit" | ${input_snd_client} &&
-echo "sendkey ret" | ${input_snd_client} &&
-sleep 2 &&
-# configure unallocated disk space
-echo "sendkey ret" | ${input_snd_client} &&
-sleep 2 &&
-# setup will restart computer.ensure disk A is inserted in drive A
-echo "sendkey ret" | ${input_snd_client} &&
-# restarting machine and formatting disk C:
-sleep 30 &&
-# confirm configuration for OS
-echo "sendkey ret" | ${input_snd_client} &&
-sleep 3 &&
-# confirm OS install directory C:\DOS
-echo "sendkey ret" | ${input_snd_client} &&
-# installing from floppy disk 1
-sleep 40 &&
-# insert and confirm floppy disk 2
-echo "change floppy0 ${bin_dir}/ms-dos-setup/Disk2.img" | ${input_snd_client} &&
-sleep 1 &&
-echo "sendkey ret" | ${input_snd_client} &&
-# installing from floppy disk 2
-sleep 40 &&
-# insert and confirm floppy disk 3
-echo "change floppy0 ${bin_dir}/ms-dos-setup/Disk3.img" | ${input_snd_client} &&
-sleep 1 &&
-echo "sendkey ret" | ${input_snd_client} &&
-# installing from floppy disk 1
-sleep 40 &&
-# eject floppy disk and confirm
-echo "eject floppy0" | ${input_snd_client} &&
-sleep 1 &&
-echo "sendkey ret" | ${input_snd_client} &&
-# restart machine
-sleep 1 &&
-echo "sendkey ret" | ${input_snd_client} &&
-# stop machine
-sleep 20 &&
-echo "quit" | ${input_snd_client} &&
+  # url="https://dl-alt1.winworldpc.com/Microsoft%20MS-DOS%206.22%20Plus%20Enhanced%20Tools%20(3.5).7z" &&
+  sleep 10 &&
+  # Start setup
+  #echo "quit" | ${input_snd_client} &&
+  echo "sendkey ret" | ${input_snd_client} &&
+  sleep 2 &&
+  # configure unallocated disk space
+  echo "sendkey ret" | ${input_snd_client} &&
+  sleep 2 &&
+  # setup will restart computer.ensure disk A is inserted in drive A
+  echo "sendkey ret" | ${input_snd_client} &&
+  # restarting machine and formatting disk C:
+  sleep 30 &&
+  # confirm configuration for OS
+  echo "sendkey ret" | ${input_snd_client} &&
+  sleep 3 &&
+  # confirm OS install directory C:\DOS
+  echo "sendkey ret" | ${input_snd_client} &&
+  # installing from floppy disk 1
+  sleep 40 &&
+  # insert and confirm floppy disk 2
+  echo "change floppy0 ${bin_dir}/ms-dos-setup/Disk2.img" | ${input_snd_client} &&
+  sleep 1 &&
+  echo "sendkey ret" | ${input_snd_client} &&
+  # installing from floppy disk 2
+  sleep 40 &&
+  # insert and confirm floppy disk 3
+  echo "change floppy0 ${bin_dir}/ms-dos-setup/Disk3.img" | ${input_snd_client} &&
+  sleep 1 &&
+  echo "sendkey ret" | ${input_snd_client} &&
+  # installing from floppy disk 1
+  sleep 40 &&
+  # eject floppy disk and confirm
+  echo "eject floppy0" | ${input_snd_client} &&
+  sleep 1 &&
+  echo "sendkey ret" | ${input_snd_client} &&
+  # restart machine
+  sleep 1 &&
+  echo "sendkey ret" | ${input_snd_client} &&
+  # stop machine
+  sleep 20 &&
+  echo "quit" | ${input_snd_client} &&
 
+  tar czf ${hdd_file}_fresh_install.tgz ${hdd_file} &&
+  true
+fi &&
 # ============================================================================ #
 # Use mTCP to connect MS-DOS to the network and user FTP to fetch files into
 # MS-DOS: https://www.brutman.com/mTCP/
@@ -132,23 +137,29 @@ echo "quit" | ${input_snd_client} &&
 if [ ! -f ${bin_dir}/mTCP.zip ]
 then
   wget https://www.brutman.com/mTCP/download/mTCP_2025-01-10.zip \
-    -O ${bin_dir}/mTCP.zip
+    -O ${bin_dir}/mTCP.zip &&
+  mkdir ${bin_dir}/mTCP &&
+  unzip ${bin_dir}/mTCP.zip -d ${bin_dir}/mTCP &&
+  true
 fi &&
-mkdir ${bin_dir}/mTCP &&
-unzip ${bin_dir}/mTCP.zip -d ${bin_dir}/mTCP &&
 
 # Will need it raw anyway for netbooting.
-qemu-img convert -f qcow2 -O raw \
-  ${bin_dir}/tmp/vm.img ${bin_dir}/tmp/vm.img.raw &&
-offset=$(( 32 * 1000 + 256 )) &&
-mdir -i ${bin_dir}/tmp/vm.img.raw@@${offset} ::/ &&
-mcopy -i ${bin_dir}/tmp/vm.img.raw@@${offset} \
-  -s ${bin_dir}/tmp/mTCP ::/mtcp &&
-mcopy -i ${bin_dir}/tmp/vm.img.raw@@${offset} \
-  ${fs_dir}/autoexec.bat ::/ &&
+#qemu-img convert -f qcow2 -O raw \
+#  ${bin_dir}/tmp/vm.img ${bin_dir}/tmp/vm.img.raw &&
+if [ ! -f ${hdd_file}_net.tgz ]
+then
+  tar xf ${hdd_file}_fresh_install.tgz &&
+  offset=$(( 32 * 1000 + 256 )) &&
+  mdir -i ${hdd_file}@@${offset} ::/ &&
+  mcopy -i ${hdd_file}@@${offset} \
+    -s ${bin_dir}/mTCP ::/mtcp &&
+  #mcopy -i ${hdd_file}@@${offset} \
+  #  -o ${fs_dir}/autoexec.bat ::/ &&
+  tar czf ${hdd_file}_net.tgz ${hdd_file} &&
+  true
+fi &&
 
-
-
+true ; exit 0
 # dd if=/dev/zero of=${bin_dir}/dosnet.img bs=1K count=1440 &&
 # mformat -f 1440 -i ${bin_dir}/dosnet.img :: &&
 # mcopy -i ${bin_dir}/dosnet.img ${bin_dir}/mTCP/dhcp.exe ::/ &&
