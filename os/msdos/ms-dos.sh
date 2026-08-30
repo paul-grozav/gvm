@@ -14,13 +14,14 @@ should_debug=1 &&
 scratch=0 &&
 # scratch=1 &&
 script_dir="$(cd $(dirname ${0}) ; pwd)" &&
+bin_dir="${1}" &&
 
 input_socket="${script_dir}/vm-input.sock" &&
 input_snd_client="socat - UNIX-CONNECT:${input_socket}" &&
 input_socket="127.0.0.1:4444" &&
 input_snd_client="socat - TCP:127.0.0.1:4444" &&
 
-cdrom_file="${script_dir}/ms-dos.iso" &&
+cdrom_file="${bin_dir}/ms-dos.iso" &&
 if [ ${scratch} -eq 1 ]
 then
   rm -f ${cdrom_file}
@@ -31,15 +32,16 @@ then
   url="https://archive.org/download/ms-dos-6.22_dvd/MS-DOS%206.22.iso" &&
   url="https://archive.org/download/DOS6.22ISO/MS-DOS%206.22.iso" &&
   url="https://dl-alt1.winworldpc.com/Microsoft%20MS-DOS%206.22%20Plus%20Enhanced%20Tools%20(3.5).7z" &&
+  url="https://dl.winworldpc.com/Microsoft%20MS-DOS%206.22%20Plus%20Enhanced%20Tools%20(3.5).7z" &&
   wget ${url} -O ${cdrom_file} &&
-  7z x ${cdrom_file} &&
-  mv ${script_dir}/Microsoft\ MS-DOS\ 6.22\ Plus\ Enhanced\ Tools\ \(3.5\)/ \
-    ${script_dir}/ms-dos-setup &&
+  7z x ${cdrom_file} -o${bin_dir} &&
+  mv ${bin_dir}/Microsoft\ MS-DOS\ 6.22\ Plus\ Enhanced\ Tools\ \(3.5\)/ \
+    ${bin_dir}/ms-dos-setup &&
   true
 fi &&
 
 # Create virtual disk
-hdd_file="${script_dir}/vm.img" &&
+hdd_file="${bin_dir}/vm.img" &&
 if [ ${scratch} -eq 1 ]
 then
   rm -f ${hdd_file}
@@ -48,6 +50,8 @@ if [ ! -f ${hdd_file} ]
 then
   qemu-img create -f qcow2 ${hdd_file} 50M
 fi &&
+
+# true; exit 0
 
 qemu_pid="$( qemu-system-x86_64 \
   ` # RAM for the machine ` \
@@ -67,7 +71,7 @@ qemu_pid="$( qemu-system-x86_64 \
   ` # Mount ISO as CD-ROM ` \
   ` # -cdrom ${cdrom_file} ` \
   ` # Mount Floppy disk ` \
-  -fda ${script_dir}/ms-dos-setup/Disk1.img \
+  -fda ${bin_dir}/ms-dos-setup/Disk1.img \
   ` # Boot from CD-ROM ` \
   -boot a \
   1>/dev/null \
@@ -96,13 +100,13 @@ echo "sendkey ret" | ${input_snd_client} &&
 # installing from floppy disk 1
 sleep 40 &&
 # insert and confirm floppy disk 2
-echo "change floppy0 ${script_dir}/ms-dos-setup/Disk2.img" | ${input_snd_client} &&
+echo "change floppy0 ${bin_dir}/ms-dos-setup/Disk2.img" | ${input_snd_client} &&
 sleep 1 &&
 echo "sendkey ret" | ${input_snd_client} &&
 # installing from floppy disk 2
 sleep 40 &&
 # insert and confirm floppy disk 3
-echo "change floppy0 ${script_dir}/ms-dos-setup/Disk3.img" | ${input_snd_client} &&
+echo "change floppy0 ${bin_dir}/ms-dos-setup/Disk3.img" | ${input_snd_client} &&
 sleep 1 &&
 echo "sendkey ret" | ${input_snd_client} &&
 # installing from floppy disk 1
@@ -168,7 +172,7 @@ echo "quit" | ${input_snd_client} &&
 # Stop debugging
 ( [ ${should_debug} -eq 1 ] && set +x || true ) &&
 
-true 
+true
 # ============================================================================ #
 # qemu-system-x86_64 \
 #   -m 2G \
