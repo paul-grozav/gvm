@@ -21,7 +21,7 @@ set PATH=%PATH%;C:\mtcp;
 :: :: nwlink
 :: :: net start
 set MTCPCFG=C:\mtcp\mtcp.cfg
-:: C:\mtcp\ne2000.com 0x60
-:: C:\mtcp\dhcp.exe
+C:\mtcp\ne2000.com 0x60
+C:\mtcp\dhcp.exe
 echo # =========================================================================== #
 :: ========================================================================== ::

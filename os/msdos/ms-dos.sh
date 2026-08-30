@@ -143,6 +143,13 @@ then
   true
 fi &&
 
+# mTCP needs NE2000 to initialize the network card before it can use it.
+if [ ! -f ${bin_dir}/ne2000.com ]
+then
+  wget https://www.brutman.com/Device_Drivers/packet_drivers/NE2000.COM \
+    -O ${bin_dir}/ne2000.com
+fi &&
+
 # Will need it raw anyway for netbooting.
 #qemu-img convert -f qcow2 -O raw \
 #  ${bin_dir}/tmp/vm.img ${bin_dir}/tmp/vm.img.raw &&
@@ -157,53 +164,50 @@ then
     -o ${fs_dir}/autoexec.bat ::/ &&
   mcopy -i ${hdd_file}@@${offset} \
     -o ${fs_dir}/mtcp/mtcp.cfg ::/mtcp &&
+  mcopy -i ${hdd_file}@@${offset} \
+    ${bin_dir}/ne2000.com ::/mtcp &&
   tar czf ${hdd_file}_net.tgz ${hdd_file} &&
   true
 fi &&
 
-true ; exit 0
-# dd if=/dev/zero of=${bin_dir}/dosnet.img bs=1K count=1440 &&
-# mformat -f 1440 -i ${bin_dir}/dosnet.img :: &&
-# mcopy -i ${bin_dir}/dosnet.img ${bin_dir}/mTCP/dhcp.exe ::/ &&
-# true) &&
-
-qemu_pid="$( qemu-system-x86_64 \
+#qemu_pid="$(
+qemu-system-x86_64 \
   ` # RAM for the machine ` \
   -m 16M \
   ` # CPU cores for the machine ` \
   -smp 1 \
   ` # Using socket file to send commands to qemu console, and key strokes ` \
   ` # -monitor unix:"${input_socket}",server,nowait ` \
-  -monitor tcp:${input_socket},server,nowait \
+  ` # -monitor tcp:${input_socket},server,nowait ` \
   ` # -monitor stdio ` \
-  ` # -display curses ` \
+  -display curses \
   ` # -display none ` \
-  -vnc :0 \
+  ` # -vnc :0 ` \
   ` # -machine graphics=off ` \
   ` # -serial stdio ` \
   -hda ${hdd_file} \
   ` # Mount ISO as CD-ROM ` \
   ` # -cdrom ${cdrom_file} ` \
   ` # Mount Floppy disk ` \
-  -fda ${bin_dir}/dosnet.img \
+  ` # -fda ${bin_dir}/dosnet.img ` \
   ` # Boot from Hard Disk ` \
   -boot c \
-  1>/dev/null \
-  2>&1 \
-  &
-  echo ${!} )" &&
-
-# Wait to boot
-sleep 10 &&
-# Copy from floppy to disk
-echo "copy A:\\dhcp.exe" | ${input_snd_client} &&
-sleep 2 &&
-echo "quit" | ${input_snd_client} &&
-
+  ` # Network interface that MSDOS can support ` \
+  -net nic,model=ne2k_isa \
+  -net user \
+  ` # 1>/dev/null ` \
+  ` # 2>&1 ` \
+  ` # & ` \
+  &&
+# echo ${!} )" &&
 
 
 
 (
+# dd if=/dev/zero of=${bin_dir}/dosnet.img bs=1K count=1440 &&
+# mformat -f 1440 -i ${bin_dir}/dosnet.img :: &&
+# mcopy -i ${bin_dir}/dosnet.img ${bin_dir}/mTCP/dhcp.exe ::/ &&
+
   exit 0;
   dd if=/dev/zero of=tedi_manual_floppy.img bs=512 count=2880 &&
   mkfs.vfat tedi_manual_floppy.img &&
