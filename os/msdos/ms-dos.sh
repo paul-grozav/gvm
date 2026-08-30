@@ -15,6 +15,7 @@ scratch=0 &&
 # scratch=1 &&
 script_dir="$(cd $(dirname ${0}) ; pwd)" &&
 bin_dir="${1}" &&
+fs_dir="${script_dir}/fs" &&
 
 input_socket="${bin_dir}/vm-input.sock" &&
 input_snd_client="socat - UNIX-CONNECT:${input_socket}" &&
@@ -143,6 +144,8 @@ offset=$(( 32 * 1000 + 256 )) &&
 mdir -i ${bin_dir}/tmp/vm.img.raw@@${offset} ::/ &&
 mcopy -i ${bin_dir}/tmp/vm.img.raw@@${offset} \
   -s ${bin_dir}/tmp/mTCP ::/mtcp &&
+mcopy -i ${bin_dir}/tmp/vm.img.raw@@${offset} \
+  ${fs_dir}/autoexec.bat ::/ &&
 
 
 
