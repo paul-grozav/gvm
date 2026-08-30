@@ -16,7 +16,7 @@ scratch=0 &&
 script_dir="$(cd $(dirname ${0}) ; pwd)" &&
 bin_dir="${1}" &&
 
-input_socket="${script_dir}/vm-input.sock" &&
+input_socket="${bin_dir}/vm-input.sock" &&
 input_snd_client="socat - UNIX-CONNECT:${input_socket}" &&
 input_socket="127.0.0.1:4444" &&
 input_snd_client="socat - TCP:127.0.0.1:4444" &&
@@ -122,8 +122,19 @@ echo "sendkey ret" | ${input_snd_client} &&
 sleep 20 &&
 echo "quit" | ${input_snd_client} &&
 
+# ============================================================================ #
 # Use mTCP to connect MS-DOS to the network and user FTP to fetch files into
 # MS-DOS: https://www.brutman.com/mTCP/
+
+if [ ! -f ${bin_dir}/mTCP.zip ]
+then
+  wget https://www.brutman.com/mTCP/download/mTCP_2025-01-10.zip \
+    -O ${bin_dir}/mTCP.zip
+fi &&
+mkdir ${bin_dir}/mTCP &&
+mv ${bin_dir}/mTCP.zip ${bin_dir}/mTCP/mTCP.zip &&
+unzip ${bin_dir}/mTCP/mTCP.zip -d ${bin_dir}/mTCP &&
+
 
 (
   exit 0;
@@ -139,6 +150,18 @@ echo "quit" | ${input_snd_client} &&
   # mdir a: &&
   # mcopy file.txt a: &&
   # mcopy * a: &&
+
+  qemu-system-x86_64 \
+    -m 16M \
+    -serial stdio \
+    -display none \
+    -machine graphics=off \
+    -monitor tcp:127.0.0.1:4444,server,nowait \
+    -boot c \
+    -hda tmp/vm.img \
+    -fda tmp/ms-dos-setup/Disk1.img \
+    &&
+
   true
 ) &&
 
