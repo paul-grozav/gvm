@@ -153,8 +153,10 @@ then
   mdir -i ${hdd_file}@@${offset} ::/ &&
   mcopy -i ${hdd_file}@@${offset} \
     -s ${bin_dir}/mTCP ::/mtcp &&
-  #mcopy -i ${hdd_file}@@${offset} \
-  #  -o ${fs_dir}/autoexec.bat ::/ &&
+  mcopy -i ${hdd_file}@@${offset} \
+    -o ${fs_dir}/autoexec.bat ::/ &&
+  mcopy -i ${hdd_file}@@${offset} \
+    -o ${fs_dir}/mtcp/mtcp.cfg ::/mtcp &&
   tar czf ${hdd_file}_net.tgz ${hdd_file} &&
   true
 fi &&
