@@ -88,8 +88,21 @@
 #
 # It might complain about incompatibilities with win 10 ... continue anyway
 # We will need these files it creates:
-# Win10XPE\Target\ containing boot.wim, boot.sdi, BCD
+# Win10XPE\ISO\sources\boot.wim
+# WIN10XPE\ISO\boot\boot.sdi
+# WIN10XPE\ISO\boot\bcd
 #
+# boot.wim contains your embedded script (along with the entire Windows PE
+# filesystem, registry, and system binaries).
+# The other two files never change:
+# boot.sdi is a static Microsoft system binary (RAM disk driver structure).
+# BCD is a static boot menu configuration file.
+#
+# Gather files:
+# mkdir C:\data\win10_output
+# copy C:\data\Win10XPE\ISO\sources\boot.wim C:\data\win10_output\
+# copy C:\data\Win10XPE\ISO\boot\boot.sdi C:\data\win10_output\
+# copy C:\data\Win10XPE\ISO\boot\bcd C:\data\win10_output\
 # ============================================================================ #
 
 # then boot with ipxe from http
