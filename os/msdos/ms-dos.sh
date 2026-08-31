@@ -163,7 +163,7 @@ then
   mcopy -i ${hdd_file}@@${offset} \
     -o ${fs_dir}/autoexec.bat ::/ &&
   mcopy -i ${hdd_file}@@${offset} \
-    -o ${fs_dir}/mtcp/mtcp.cfg ::/mtcp &&
+    ${fs_dir}/mtcp/mtcp.cfg ::/mtcp &&
   mcopy -i ${hdd_file}@@${offset} \
     ${bin_dir}/ne2000.com ::/mtcp &&
   tar czf ${hdd_file}_net.tgz ${hdd_file} &&
