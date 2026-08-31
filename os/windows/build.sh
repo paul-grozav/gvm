@@ -104,25 +104,19 @@
 # copy C:\data\Win10XPE\ISO\boot\boot.sdi C:\data\win10_output\
 # copy C:\data\Win10XPE\ISO\boot\bcd C:\data\win10_output\
 # ============================================================================ #
-
-# then boot with ipxe from http
-
-# #!ipxe
-# dhcp
-
-# # Set server root URL
-# set boot-url http://192.168.1.100/winpe
-
-# # Download files to client RAM via HTTP
-# kernel ${boot-url}/wimboot
-# initrd ${boot-url}/BCD         BCD
-# initrd ${boot-url}/boot.sdi    boot.sdi
-# initrd ${boot-url}/boot.wim    boot.wim
-
-# # Execute Win10XPE inside RAM
-# boot
-
-# uses ~1.4 GiB of RAM
+# iPXE config to boot this:
+# kernel --timeout 5000 ${home_url}/bin/boot/windows/win10xpe/wimboot || goto start
+# # Note how we specify the filename alias after each initrd file loaded.
+# # When downloading files individually in iPXE, wimboot relies on iPXE giving
+# # each initrd file an explicit target filename alias (e.g., initrd .../bcd BCD).
+# # Without the trailing alias, iPXE wraps the files in a CPIO archive structure
+# # that wimboot fails to unpack.
+# initrd --timeout 5000 ${home_url}/bin/boot/windows/win10xpe/bcd BCD || goto start
+# initrd --timeout 5000 ${home_url}/bin/boot/windows/win10xpe/boot.sdi boot.sdi || goto start
+# initrd --timeout 5000 ${home_url}/bin/boot/windows/win10xpe/boot.wim boot.wim || goto start
+# # imgargs memdisk harddisk || goto start
+# boot || goto start
+# goto start
 # ============================================================================ #
 set -x &&
 
@@ -130,8 +124,9 @@ script_dir="$(cd $(dirname ${0}); pwd)" &&
 bin_dir="/home/paul/data/binaries_h313/network/containers/http/boot/FreeDOS" &&
 bin_dir="${1}" &&
 
-
-
+# https://github.com/ipxe/wimboot/releases
+wget https://github.com/ipxe/wimboot/releases/download/v2.9.0/wimboot \
+  -O ${bin_dir}/wimboot &&
 
 set +x &&
 exit 0
