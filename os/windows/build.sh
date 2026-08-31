@@ -120,6 +120,8 @@
 # ============================================================================ #
 set -x &&
 
+# Uses 1.12 GiB of RAM in Windows' Task Manager on a 2GiB RAM VM.
+
 script_dir="$(cd $(dirname ${0}); pwd)" &&
 bin_dir="/home/paul/data/binaries_h313/network/containers/http/boot/FreeDOS" &&
 bin_dir="${1}" &&
