@@ -118,9 +118,22 @@
 # boot || goto start
 # goto start
 # ============================================================================ #
+# Uses 1.12 GiB of RAM in Windows' Task Manager on a 2GiB RAM VM.
+# This includes the boot.wim and the cache(writable space on X:\) plus the RAM
+# used by all running processes.
+# ============================================================================ #
+# This OS has drivers for The Virtual Box NIC Intel PRO/1000MT Desktop (82540EM)
+# You can install VBox Guest Additions disk, install the software but don't
+# restart. Then run in cmd.exe:
+# pnputil /add-driver "X:\Program Files\Oracle\VirtualBox Guest Additions\VBoxGuest.inf" /install
+# pnputil /add-driver "X:\Program Files\Oracle\VirtualBox Guest Additions\VBoxSF.inf" /install
+# net start vboxsf
+# explorer \\vboxsrv
+#
+# This should show you the shared folder.
+# ============================================================================ #
 set -x &&
 
-# Uses 1.12 GiB of RAM in Windows' Task Manager on a 2GiB RAM VM.
 
 script_dir="$(cd $(dirname ${0}); pwd)" &&
 bin_dir="/home/paul/data/binaries_h313/network/containers/http/boot/FreeDOS" &&
