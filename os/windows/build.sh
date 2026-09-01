@@ -125,10 +125,11 @@
 # This OS has drivers for The Virtual Box NIC Intel PRO/1000MT Desktop (82540EM)
 # You can install VBox Guest Additions disk, install the software but don't
 # restart. Then run in cmd.exe:
-# pnputil /add-driver "X:\Program Files\Oracle\VirtualBox Guest Additions\VBoxGuest.inf" /install
-# pnputil /add-driver "X:\Program Files\Oracle\VirtualBox Guest Additions\VBoxSF.inf" /install
+# :: pnputil /add-driver "X:\Program Files\Oracle\VirtualBox Guest Additions\VBoxGuest.inf" /install
+# :: pnputil /add-driver "X:\Program Files\Oracle\VirtualBox Guest Additions\VBoxSF.inf" /install
 # net start vboxsf
 # explorer \\vboxsrv
+# net use Z: \\vboxsrv\windows /persistent:yes
 #
 # This should show you the shared folder.
 # ============================================================================ #
